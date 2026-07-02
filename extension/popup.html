@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      body { width: 260px; margin: 0; padding: 14px; font: 13px "Palatino Linotype", "Book Antiqua", Georgia, serif;
+        color: #3a2a12; background: linear-gradient(160deg, #fdf6e3, #ecd9a8); }
+      h1 { margin: 0 0 2px; font-size: 17px;
+        background: linear-gradient(#a67c00, #6b4f12); -webkit-background-clip: text; background-clip: text; color: transparent; }
+      .sub { font-size: 11px; font-style: italic; color: #6b4f12; margin-bottom: 10px; }
+      p { font-size: 12px; }
+      .langs { font-size: 12px; line-height: 1.7; }
+      button { font-family: inherit; cursor: pointer; color: #4a3208; border: 2px solid #8a6710; border-radius: 5px;
+        background: linear-gradient(#fff7d6, #e7c14e 60%, #c8961a); padding: 6px 10px; font-weight: 700; margin-top: 8px; }
+      .status { font-size: 11px; margin-top: 8px; min-height: 14px; color: #2e6b2e; }
+      .status.err { color: #8b0000; }
+    </style>
+  </head>
+  <body>
+    <h1>Bible Echo ✝</h1>
+    <div class="sub">100% hors-ligne · on-device</div>
+    <p>Click the golden <b>✝ medallion</b> on any page (drag it anywhere). All settings — language, mode, sensitivity, local LLM — live in that panel.</p>
+    <div class="langs">📖 KJV 1611 · Martin 1744 · S. Escrituras 1569 · Diodati 1649 · Gdańska</div>
+    <button id="selfTest">Run tokenizer self-test</button>
+    <div class="status" id="status"></div>
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>

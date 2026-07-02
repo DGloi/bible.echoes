@@ -1,0 +1,44 @@
+{
+  "fab": { "title": "Échos Bibliques — glissez pour déplacer, cliquez pour ouvrir" },
+  "brand": { "title": "Échos Bibliques", "subtitle": "— scrutez la page à la lumière des Écritures —" },
+  "actions": { "reveal": "🕯️ Révéler les échos", "refresh": "Rafraîchir" },
+  "labels": { "mode": "Lecture", "language": "Langue", "threshold": "Seuil", "auto": "✶ Auto" },
+  "modes": {
+    "neutral": { "label": "☩ Neutre", "title": "Analyse neutre" },
+    "positive": { "label": "✚ Positif", "title": "Concordances" },
+    "negative": { "label": "⚔ Négatif", "title": "Contradictions" }
+  },
+  "oracle": {
+    "summary": "⚙ Oracle local (LLM) — facultatif",
+    "enable": "✨ Activer l’Oracle local (1 clic)",
+    "activePrefix": "✦ Oracle actif —",
+    "disable": "désactiver",
+    "retry": "↻ Réessayer",
+    "present": "déjà présent",
+    "meditating": "✦ L’oracle médite…",
+    "unavailable": "indisponible",
+    "steps": { "ping": "Recherche d’Ollama", "model": "Modèle", "pull": "Téléchargement du modèle", "test": "Test de l’oracle" },
+    "help": {
+      "notDetected": "Ollama n’est pas lancé.",
+      "blocked": "Ollama tourne mais bloque cette extension.",
+      "install": "Installez Ollama :",
+      "allow": "Donnez accès à cette extension, puis redémarrez Ollama :",
+      "download": "Téléchargez un modèle (100% sur votre machine) :",
+      "restart": "puis quittez et rouvrez Ollama pour l’appliquer",
+      "oneoff": "ou juste pour cette session :",
+      "size": "≈ 1,3 Go pour llama3.2:1b · plus léger : qwen2.5:0.5b (~400 Mo)"
+    }
+  },
+  "status": {
+    "reading": "Lecture des Écritures…",
+    "noText": "Aucun texte lisible.",
+    "failed": "Échec : ",
+    "error": "Erreur : ",
+    "summary": "{n} échos · {analyzed} passages · {lang}",
+    "chunks": "{hits} échos · {done}/{total} sections · {lang}",
+    "ofTotal": " (sur {total})",
+    "autoTag": " (auto)"
+  },
+  "results": { "empty": "Nul écho n’a franchi le seuil. Abaissez-le, ou changez de langue." },
+  "footer": { "marquee": "✠ Pax Domini sit semper vobiscum ✠   Que la paix soit avec vous   ✠   analyse 100% hors-ligne   ✠", "counter": "Visiteurs bénis :" }
+}

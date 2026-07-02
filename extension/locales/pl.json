@@ -1,0 +1,44 @@
+{
+  "fab": { "title": "Echa Biblijne — przeciągnij, aby przesunąć, kliknij, aby otworzyć" },
+  "brand": { "title": "Echa Biblijne", "subtitle": "— badaj stronę w świetle Pisma —" },
+  "actions": { "reveal": "🕯️ Odkryj echa", "refresh": "Odśwież" },
+  "labels": { "mode": "Czytanie", "language": "Język", "threshold": "Próg", "auto": "✶ Auto" },
+  "modes": {
+    "neutral": { "label": "☩ Neutralny", "title": "Analiza neutralna" },
+    "positive": { "label": "✚ Pozytywny", "title": "Zgodności" },
+    "negative": { "label": "⚔ Negatywny", "title": "Sprzeczności" }
+  },
+  "oracle": {
+    "summary": "⚙ Lokalna Wyrocznia (LLM) — opcjonalnie",
+    "enable": "✨ Włącz lokalną Wyrocznię (1 kliknięcie)",
+    "activePrefix": "✦ Wyrocznia aktywna —",
+    "disable": "wyłącz",
+    "retry": "↻ Ponów",
+    "present": "już obecny",
+    "meditating": "✦ Wyrocznia rozważa…",
+    "unavailable": "niedostępna",
+    "steps": { "ping": "Szukanie Ollamy", "model": "Model", "pull": "Pobieranie modelu", "test": "Test wyroczni" },
+    "help": {
+      "notDetected": "Ollama nie jest uruchomiona.",
+      "blocked": "Ollama działa, ale blokuje to rozszerzenie.",
+      "install": "Zainstaluj Ollamę:",
+      "allow": "Udziel dostępu temu rozszerzeniu, a następnie zrestartuj Ollamę:",
+      "download": "Pobierz model (w 100% na Twoim urządzeniu):",
+      "restart": "następnie zamknij i otwórz ponownie Ollamę, aby zastosować",
+      "oneoff": "albo tylko na tę sesję:",
+      "size": "≈ 1,3 GB dla llama3.2:1b · lżejszy: qwen2.5:0.5b (~400 MB)"
+    }
+  },
+  "status": {
+    "reading": "Czytanie Pisma…",
+    "noText": "Brak czytelnego tekstu.",
+    "failed": "Niepowodzenie: ",
+    "error": "Błąd: ",
+    "summary": "{n} ech · {analyzed} fragmentów · {lang}",
+    "chunks": "{hits} ech · {done}/{total} sekcji · {lang}",
+    "ofTotal": " (z {total})",
+    "autoTag": " (auto)"
+  },
+  "results": { "empty": "Żadne echo nie przekroczyło progu. Obniż go lub zmień język." },
+  "footer": { "marquee": "✠ Pax Domini sit semper vobiscum ✠   Pokój z wami   ✠   analiza w 100% offline   ✠", "counter": "Pobłogosławieni goście:" }
+}

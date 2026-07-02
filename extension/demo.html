@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Bible Echo — démo multilingue</title>
+    <style>
+      * { box-sizing: border-box; font-family: "Palatino Linotype","Book Antiqua",Palatino,Georgia,serif; }
+      body { margin: 0; background: linear-gradient(160deg,#fdf6e3,#ecd9a8); color: #3a2a12; }
+      header { color:#fff; padding:14px 22px; border-bottom:3px double #8a6710;
+        background: radial-gradient(circle at 20% 130%,#b8242f 0 16%,transparent 16.5%),
+          radial-gradient(circle at 50% 130%,#1d6fb8 0 15%,transparent 15.5%),
+          radial-gradient(circle at 80% 130%,#2e8b57 0 16%,transparent 16.5%),
+          linear-gradient(180deg,#3a1f5c,#241038); }
+      header h1 { margin:0; font-size:24px; background:linear-gradient(#fff3c4,#e7c14e,#b8860b);
+        -webkit-background-clip:text; background-clip:text; color:transparent; }
+      header .s { font-size:12px; font-style:italic; color:#f0e2b8; }
+      .wrap { max-width: 1000px; margin: 18px auto; padding: 0 18px; display:flex; gap:18px; align-items:flex-start; }
+      .col { flex:1; } .side { width: 330px; }
+      .card { background: rgba(255,255,255,.55); border:3px solid #c8961a; border-radius:8px; padding:14px; box-shadow:0 4px 16px rgba(0,0,0,.15); }
+      button,select { font-family:inherit; cursor:pointer; color:#4a3208; border:2px solid #8a6710; border-radius:5px;
+        background:linear-gradient(#fff7d6,#e7c14e 60%,#c8961a); padding:7px 12px; font-weight:700; box-shadow:0 2px 0 #8a6710; }
+      .langs button { padding:5px 9px; margin:2px; }
+      .langs button.on { background:linear-gradient(#7a5a1e,#5a3d0a); color:#fff; }
+      .modes { display:inline-flex; margin-left:8px; }
+      .mode { padding:6px 9px; border:2px solid #8a6710; font-weight:700; background:#f3e6c4; }
+      .mode.positive.on{background:linear-gradient(#2e8b57,#1c5a37);color:#fff} .mode.negative.on{background:linear-gradient(#b8242f,#7d1019);color:#fff}
+      .mode.neutral.on{background:linear-gradient(#7a5a1e,#5a3d0a);color:#fff}
+      .ctl { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:10px; }
+      #article { line-height:1.7; font-size:17px; min-height:160px; outline:none; }
+      .sent.hit { background:rgba(200,150,26,.28); border-bottom:2px dotted #8b0000; border-radius:3px; cursor:pointer; }
+      .sent.hit.positive{background:rgba(46,139,87,.26)} .sent.hit.negative{background:rgba(184,36,47,.24)}
+      .sent.flash { background:rgba(255,145,0,.6); }
+      h2 { font-size:13px; text-transform:uppercase; color:#7a5a1e; letter-spacing:.05em; }
+      .verse { padding:9px 2px; border-bottom:1px solid #e3d3a6; cursor:pointer; }
+      .verse .ref { color:#8b0000; font-weight:700; text-decoration:none; } .verse .ref:hover{text-decoration:underline}
+      .verse .score { float:right; font-size:11px; background:#e7c14e; border:1px solid #8a6710; border-radius:8px; padding:0 6px; }
+      .verse .vt { font-size:13px; margin-top:3px; }
+      .status { font-style:italic; color:#6b4f12; font-size:13px; min-height:16px; }
+    </style>
+  </head>
+  <body>
+    <header><h1>Échos Bibliques ✝ — démo</h1><div class="s">Même moteur que l’extension · 5 langues · 100% hors-ligne</div></header>
+    <div class="wrap">
+      <div class="col card">
+        <div class="ctl langs" id="langs"></div>
+        <div class="ctl">
+          <button id="reveal">🕯️ Révéler les échos</button>
+          <span class="modes"><span class="mode neutral on" data-m="neutral">☩</span><span class="mode positive" data-m="positive">✚</span><span class="mode negative" data-m="negative">⚔</span></span>
+          seuil <input type="range" id="thr" min="0.4" max="0.75" step="0.01" value="0.5"><b id="thrv">0.50</b>
+        </div>
+        <div class="status" id="status">Chargement du moteur…</div>
+        <div id="article" contenteditable="true" spellcheck="false"></div>
+      </div>
+      <div class="side card"><h2 id="rh">Échos</h2><div id="results"><span class="status">—</span></div></div>
+    </div>
+    <script type="module">
+      const $ = (s) => document.querySelector(s);
+      window.chrome = { runtime: { getURL: (p) => location.origin + "/" + p } };
+      let S, mode = "neutral", lang = "fr";
+      const SAMPLES = {
+        en: "Letting go of a grudge is hard, but there is freedom in forgiving the person who wronged you. In the beginning everything started from light, and the heavens were formed. A good leader defends the poor and seeks justice. Meanwhile the company's share price fell after weak earnings.",
+        fr: "Renoncer à la rancune est difficile, mais il y a une liberté à pardonner à celui qui t'a offensé. Au commencement, tout naquit de la lumière, et les cieux furent formés. Un bon chef défend le pauvre et recherche la justice. Pendant ce temps, l'action de l'entreprise a chuté après de faibles résultats.",
+        es: "Soltar el rencor es difícil, pero hay libertad en perdonar a quien te hizo mal. En el principio todo comenzó con la luz, y los cielos fueron formados. Un buen líder defiende al pobre y busca la justicia. Mientras tanto, las acciones de la empresa cayeron tras malos resultados.",
+        it: "Lasciar andare il rancore è difficile, ma c'è libertà nel perdonare chi ti ha fatto torto. In principio tutto cominciò dalla luce, e i cieli furono formati. Un buon capo difende il povero e cerca la giustizia. Intanto le azioni della società sono crollate dopo conti deboli.",
+        pl: "Trudno porzucić urazę, lecz jest wolność w przebaczeniu temu, kto cię skrzywdził. Na początku wszystko zaczęło się od światła, a niebiosa zostały utworzone. Dobry przywódca broni ubogiego i szuka sprawiedliwości. Tymczasem akcje spółki spadły po słabych wynikach.",
+      };
+      const LANGS = [["en","English"],["fr","Français"],["es","Español"],["it","Italiano"],["pl","Polski"]];
+      $("#langs").innerHTML = LANGS.map(([c,n]) => `<button data-l="${c}" class="${c===lang?'on':''}">${n}</button>`).join("");
+      $("#article").textContent = SAMPLES[lang];
+      const esc = (s) => s.replace(/[&<>]/g, (c) => ({ "&":"&amp;","<":"&lt;",">":"&gt;" }[c]));
+      const splitSents = (t) => t.split(/(?<=[.!?])\s+/).map((x) => x.trim()).filter((x) => x.length >= 18);
+
+      document.querySelectorAll("[data-l]").forEach((b) => b.onclick = () => {
+        lang = b.dataset.l; document.querySelectorAll("[data-l]").forEach((x)=>x.classList.toggle("on",x===b));
+        $("#article").textContent = SAMPLES[lang]; clear();
+      });
+      document.querySelectorAll(".mode").forEach((m) => m.onclick = () => {
+        mode = m.dataset.m; document.querySelectorAll(".mode").forEach((x)=>x.classList.toggle("on",x===m));
+        document.querySelectorAll(".sent.hit").forEach((s)=>{s.classList.remove("positive","negative"); if(mode!=="neutral")s.classList.add(mode);});
+      });
+      $("#thr").oninput = () => $("#thrv").textContent = (+$("#thr").value).toFixed(2);
+      $("#reveal").onclick = analyze;
+      function clear(){ $("#results").innerHTML='<span class="status">—</span>'; $("#rh").textContent="Échos"; }
+
+      async function analyze() {
+        if (!S) return;
+        const thr = +$("#thr").value;
+        const sents = splitSents($("#article").innerText);
+        $("#article").innerHTML = sents.map((s,i)=>`<span class="sent" id="s${i}">${esc(s)}</span>`).join(" ");
+        const r = await S.analyzePassages(sents, lang, { minScore: thr, maxPassages: 80, maxResults: 40 });
+        const hits = r.results.map((x)=>({ i:x.i, ...x.hits[0] })).sort((a,b)=>b.score-a.score);
+        $("#status").textContent = `${hits.length} échos · ${r.analyzed} phrases · ${lang}`;
+        $("#rh").textContent = `Échos (${hits.length})`;
+        hits.forEach((h)=>{ const sp=$("#s"+h.i); if(sp){sp.classList.add("hit"); if(mode!=="neutral")sp.classList.add(mode); sp.title=h.ref+" — "+h.text; sp.onclick=()=>window.open(h.chapterUrl,"_blank");}});
+        $("#results").innerHTML = hits.length ? hits.map((h)=>`<div class="verse" data-i="${h.i}"><a class="ref" href="${h.chapterUrl}" target="_blank">${esc(h.ref)}</a><span class="score">${(h.score*100).toFixed(0)}%</span><div class="vt">${esc(h.text)}</div></div>`).join("") : '<span class="status">Aucun écho au-dessus du seuil.</span>';
+        document.querySelectorAll(".verse").forEach((el)=>el.onclick=(e)=>{ if(e.target.tagName==="A")return; const sp=$("#s"+el.dataset.i); sp.scrollIntoView({behavior:"smooth",block:"center"}); sp.classList.add("flash"); setTimeout(()=>sp.classList.remove("flash"),1400); });
+      }
+
+      try { S = await import("/offscreen/store.js"); await S.ready(); $("#status").textContent = "Prêt — cliquez « Révéler les échos »."; }
+      catch (e) { $("#status").textContent = "Erreur de chargement : " + e.message; }
+    </script>
+  </body>
+</html>

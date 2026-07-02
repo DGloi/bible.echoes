@@ -1,0 +1,23 @@
+/* Painted by the CSS Custom Highlight API (see content.js). Document-level —
+   ::highlight() cannot live in a shadow root. Amber "stained-glass / candlelight"
+   tint for matches; deeper gold for the actively focused verse. */
+
+::highlight(bible-echo) {
+  background-color: rgba(212, 160, 23, 0.28);
+  text-decoration: underline;
+  text-decoration-color: rgba(150, 16, 16, 0.55);
+  text-decoration-style: dotted;
+}
+
+/* tint per LLM mode so highlights read at a glance */
+::highlight(bible-echo-positive) {
+  background-color: rgba(60, 140, 60, 0.26);
+  text-decoration: underline dotted rgba(20, 90, 20, 0.6);
+}
+::highlight(bible-echo-negative) {
+  background-color: rgba(150, 16, 16, 0.22);
+  text-decoration: underline dotted rgba(120, 10, 10, 0.6);
+}
+::highlight(bible-echo-active) {
+  background-color: rgba(214, 158, 20, 0.7);
+}

@@ -1,0 +1,44 @@
+{
+  "fab": { "title": "Ecos Bíblicos — arrastra para mover, haz clic para abrir" },
+  "brand": { "title": "Ecos Bíblicos", "subtitle": "— escruta la página a la luz de las Escrituras —" },
+  "actions": { "reveal": "🕯️ Revelar los ecos", "refresh": "Actualizar" },
+  "labels": { "mode": "Lectura", "language": "Idioma", "threshold": "Umbral", "auto": "✶ Auto" },
+  "modes": {
+    "neutral": { "label": "☩ Neutral", "title": "Análisis neutral" },
+    "positive": { "label": "✚ Positivo", "title": "Concordancias" },
+    "negative": { "label": "⚔ Negativo", "title": "Contradicciones" }
+  },
+  "oracle": {
+    "summary": "⚙ Oráculo local (LLM) — opcional",
+    "enable": "✨ Activar el Oráculo local (1 clic)",
+    "activePrefix": "✦ Oráculo activo —",
+    "disable": "desactivar",
+    "retry": "↻ Reintentar",
+    "present": "ya presente",
+    "meditating": "✦ El oráculo medita…",
+    "unavailable": "no disponible",
+    "steps": { "ping": "Buscando Ollama", "model": "Modelo", "pull": "Descargando el modelo", "test": "Probando el oráculo" },
+    "help": {
+      "notDetected": "Ollama no se está ejecutando.",
+      "blocked": "Ollama está en ejecución pero bloquea esta extensión.",
+      "install": "Instala Ollama:",
+      "allow": "Da acceso a esta extensión y reinicia Ollama:",
+      "download": "Descarga un modelo (100% en tu máquina):",
+      "restart": "luego cierra y vuelve a abrir Ollama para aplicarlo",
+      "oneoff": "o solo por esta sesión:",
+      "size": "≈ 1,3 GB para llama3.2:1b · más ligero: qwen2.5:0.5b (~400 MB)"
+    }
+  },
+  "status": {
+    "reading": "Leyendo las Escrituras…",
+    "noText": "No hay texto legible.",
+    "failed": "Error: ",
+    "error": "Error: ",
+    "summary": "{n} ecos · {analyzed} pasajes · {lang}",
+    "chunks": "{hits} ecos · {done}/{total} secciones · {lang}",
+    "ofTotal": " (de {total})",
+    "autoTag": " (auto)"
+  },
+  "results": { "empty": "Ningún eco superó el umbral. Bájalo o cambia de idioma." },
+  "footer": { "marquee": "✠ Pax Domini sit semper vobiscum ✠   La paz sea con vosotros   ✠   análisis 100% sin conexión   ✠", "counter": "Visitantes benditos:" }
+}

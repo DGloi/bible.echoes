@@ -1,0 +1,44 @@
+{
+  "fab": { "title": "Bible Echoes — drag to move, click to open" },
+  "brand": { "title": "Bible Echoes", "subtitle": "— search the page in the light of Scripture —" },
+  "actions": { "reveal": "🕯️ Reveal the echoes", "refresh": "Refresh" },
+  "labels": { "mode": "Reading", "language": "Language", "threshold": "Threshold", "auto": "✶ Auto" },
+  "modes": {
+    "neutral": { "label": "☩ Neutral", "title": "Neutral analysis" },
+    "positive": { "label": "✚ Positive", "title": "Concordances" },
+    "negative": { "label": "⚔ Negative", "title": "Contradictions" }
+  },
+  "oracle": {
+    "summary": "⚙ Local Oracle (LLM) — optional",
+    "enable": "✨ Enable the local Oracle (1 click)",
+    "activePrefix": "✦ Oracle active —",
+    "disable": "disable",
+    "retry": "↻ Retry",
+    "present": "already present",
+    "meditating": "✦ The oracle is pondering…",
+    "unavailable": "unavailable",
+    "steps": { "ping": "Looking for Ollama", "model": "Model", "pull": "Downloading the model", "test": "Testing the oracle" },
+    "help": {
+      "notDetected": "Ollama isn’t running.",
+      "blocked": "Ollama is running but is blocking this extension.",
+      "install": "Install Ollama:",
+      "allow": "Give this extension access, then restart Ollama:",
+      "download": "Download a model (runs 100% on your machine):",
+      "restart": "then quit & reopen Ollama so it applies",
+      "oneoff": "or just this session:",
+      "size": "≈ 1.3 GB for llama3.2:1b · lighter: qwen2.5:0.5b (~400 MB)"
+    }
+  },
+  "status": {
+    "reading": "Reading the Scriptures…",
+    "noText": "No readable text.",
+    "failed": "Failed: ",
+    "error": "Error: ",
+    "summary": "{n} echoes · {analyzed} passages · {lang}",
+    "chunks": "{hits} echoes · {done}/{total} sections · {lang}",
+    "ofTotal": " (of {total})",
+    "autoTag": " (auto)"
+  },
+  "results": { "empty": "No echo crossed the threshold. Lower it, or change the language." },
+  "footer": { "marquee": "✠ Pax Domini sit semper vobiscum ✠   Peace be with you   ✠   100% on-device analysis   ✠", "counter": "Blessed visitors:" }
+}

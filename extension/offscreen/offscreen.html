@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Bible Echo worker</title>
+  </head>
+  <body>
+    <!-- Hidden worker page: hosts the Transformers.js tokenizer + embedding store
+         off the service worker (which can't reliably hold large state / WASM). -->
+    <script type="module" src="offscreen.js"></script>
+  </body>
+</html>
