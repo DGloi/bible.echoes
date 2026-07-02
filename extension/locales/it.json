@@ -1,7 +1,7 @@
 {
   "fab": { "title": "Echi Biblici — trascina per spostare, clicca per aprire" },
   "brand": { "title": "Echi Biblici", "subtitle": "— scruta la pagina alla luce delle Scritture —" },
-  "actions": { "reveal": "🕯️ Rivela gli echi", "refresh": "Aggiorna" },
+  "actions": { "reveal": "🕯️ Rivela gli echi" },
   "labels": { "mode": "Lettura", "language": "Lingua", "threshold": "Soglia", "auto": "✶ Auto" },
   "modes": {
     "neutral": { "label": "☩ Neutro", "title": "Analisi neutra" },
@@ -10,6 +10,11 @@
   },
   "oracle": {
     "summary": "⚙ Oracolo locale (LLM) — facoltativo",
+    "provider": "Fornitore",
+    "provOllama": "Locale (Ollama)",
+    "provOpenai": "Cloud (OpenAI)",
+    "openaiPopup": "Imposta la tua chiave OpenAI nel popup della barra degli strumenti per attivare il cloud.",
+    "cloudWarn": "⚠ La modalità cloud invia i passaggi analizzati a OpenAI (non in locale).",
     "enable": "✨ Attiva l’Oracolo locale (1 clic)",
     "activePrefix": "✦ Oracolo attivo —",
     "disable": "disattiva",
@@ -40,5 +45,6 @@
     "autoTag": " (auto)"
   },
   "results": { "empty": "Nessun eco ha superato la soglia. Abbassala o cambia lingua." },
-  "footer": { "marquee": "✠ Pax Domini sit semper vobiscum ✠   La pace sia con voi   ✠   analisi 100% offline   ✠", "counter": "Visitatori benedetti:" }
+  "footer": { "marquee": "✠ Pax Domini sit semper vobiscum ✠   La pace sia con voi   ✠   analisi 100% offline   ✠", "counter": "Visitatori benedetti:", "donate": "♥ Sostieni questo progetto" },
+  "support": { "enjoy": "Ti piace Echi Biblici?", "coffee": "☕ Offrimi un caffè" }
 }

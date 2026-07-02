@@ -7,7 +7,8 @@
 //   oracle-setup.js      – one-click "enable local LLM" (imported for its port listener)
 
 import { getSettings, setSettings } from "../core/settings.js";
-import { reason } from "./ollama.js";
+import { reason as ollamaReason } from "./ollama.js";
+import { reason as openaiReason, test as openaiTest } from "./openai.js";
 import { ensureOffscreen, toOffscreen } from "./offscreen-bridge.js";
 import { detectLang } from "./language.js";
 import "./oracle-setup.js"; // side-effect import: registers the be-ollama-setup port handler
@@ -18,9 +19,13 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   (async () => {
     try {
       switch (msg.type) {
-        case "getSettings":
-          sendResponse({ ok: true, settings: await getSettings() });
+        case "getSettings": {
+          // Never expose the OpenAI key to a content script (it runs in web pages).
+          // Send a boolean instead; the popup reads the real key directly from storage.
+          const { openaiApiKey, ...safe } = await getSettings();
+          sendResponse({ ok: true, settings: { ...safe, openaiKeySet: !!openaiApiKey } });
           break;
+        }
         case "setSettings":
           sendResponse({ ok: true, settings: await setSettings(msg.patch || {}) });
           break;
@@ -48,6 +53,14 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
           break;
         case "reason":
           sendResponse(await runReason(msg));
+          break;
+        case "openaiTest":
+          try {
+            await openaiTest({ baseUrl: msg.baseUrl, apiKey: msg.apiKey, model: msg.model });
+            sendResponse({ ok: true });
+          } catch (e) {
+            sendResponse({ ok: false, error: String((e && e.message) || e) });
+          }
           break;
         default:
           sendResponse({ ok: false, error: "unknown message: " + msg.type });
@@ -77,27 +90,17 @@ async function analyze(msg) {
     options: { minScore: s.minScore, maxPassages: s.maxPassages, maxResults: s.maxResults },
   });
   if (!r || !r.ok) return r || { ok: false, error: "offscreen did not respond" };
-  return {
-    ...r,
-    languageUsed: lang,
-    detected,
-    mode: msg.mode || s.mode,
-    useOllama: s.useOllama,
-    ollamaTopPassages: s.ollamaTopPassages,
-  };
+  return { ...r, languageUsed: lang, detected, mode: msg.mode || s.mode, llmEnabled: s.llmEnabled };
 }
 
 /** Ask the local LLM to reason about the top matches (only if the user enabled it). */
 async function runReason(msg) {
   const s = await getSettings();
-  if (!s.useOllama) return { ok: false, error: "Local LLM is off." };
-  const text = await reason({
-    url: s.ollamaUrl,
-    model: s.ollamaModel,
-    mode: msg.mode || s.mode,
-    passage: msg.passage,
-    candidates: msg.candidates,
-    language: msg.language,
-  });
+  if (!s.llmEnabled) return { ok: false, error: "LLM reasoning is off." };
+  const common = { mode: msg.mode || s.mode, passage: msg.passage, candidates: msg.candidates, language: msg.language };
+  const text =
+    s.llmProvider === "openai"
+      ? await openaiReason({ baseUrl: s.openaiBaseUrl, apiKey: s.openaiApiKey, model: s.openaiModel, ...common })
+      : await ollamaReason({ url: s.ollamaUrl, model: s.ollamaModel, ...common });
   return { ok: true, text };
 }

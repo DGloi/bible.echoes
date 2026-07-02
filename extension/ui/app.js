@@ -87,8 +87,6 @@ export async function start() {
   $("#thrv").textContent = Number($("#thr").value).toFixed(2);
   langSel.value = s.language || "auto";
   setMode(s.mode || "neutral", false);
-  $("#ollamaModel").value = s.ollamaModel || "llama3.2:1b";
-  $("#ollamaUrl").value = s.ollamaUrl || "http://localhost:11434";
   $("#counter").textContent = String(1000 + Math.floor((Date.now() / 60000) % 8000)).padStart(7, "0");
   updateModeRow();
 
@@ -102,17 +100,17 @@ export async function start() {
     onDrop: (x, y) => save({ fabX: x, fabY: y }),
   });
 
-  // ---- optional local-LLM setup section ----
-  const oracle = createOracle({
+  // ---- optional LLM setup (oracle-ui owns the whole gear UI: provider, Ollama, OpenAI) ----
+  createOracle({
     root,
-    onEnabled: () => {
-      state.settings.useOllama = true;
+    save,
+    getSettings: () => state.settings,
+    onChange: () => {
       updateModeRow();
       recolor();
-      requeueLLM(); // analyze already-shown chunks with the newly enabled LLM
+      requeueLLM(); // (re)analyze shown chunks under the current LLM state
     },
   });
-  if (s.useOllama) oracle.setActive(s.ollamaModel || "llama3.2:1b");
 
   // ---- event wiring ----
   $("#thr").addEventListener("input", () => { $("#thrv").textContent = Number($("#thr").value).toFixed(2); });
@@ -123,17 +121,7 @@ export async function start() {
     localize(root);
   });
   $("#reveal").addEventListener("click", reveal);
-  $("#refresh").addEventListener("click", reveal);
-  $("#ollamaModel").addEventListener("change", () => save({ ollamaModel: $("#ollamaModel").value.trim() }));
-  $("#ollamaUrl").addEventListener("change", () => save({ ollamaUrl: $("#ollamaUrl").value.trim() }));
-  $("#orEnable").addEventListener("click", () => oracle.start());
-  $("#orDisable").addEventListener("click", (e) => {
-    e.preventDefault();
-    save({ useOllama: false });
-    updateModeRow();
-    recolor();
-    oracle.show("idle");
-  });
+  $("#supportClose").addEventListener("click", () => { $("#supportPrompt").hidden = true; });
   root.querySelectorAll(".mode").forEach((m) => m.addEventListener("click", () => setMode(m.dataset.mode, true)));
   window.addEventListener("resize", () => {
     medallion.place(host.offsetLeft, host.offsetTop); // re-clamp so it can't strand off-screen
@@ -149,8 +137,8 @@ export async function start() {
     send({ type: "setSettings", patch });
   }
   // Modes are LLM reasoning prompts, so the picker only matters when the LLM is on.
-  const effMode = () => (state.settings.useOllama ? state.settings.mode || "neutral" : "neutral");
-  function updateModeRow() { modeRow.style.display = state.settings.useOllama ? "flex" : "none"; }
+  const effMode = () => (state.settings.llmEnabled ? state.settings.mode || "neutral" : "neutral");
+  function updateModeRow() { modeRow.style.display = state.settings.llmEnabled ? "flex" : "none"; }
   function setStatus(text, err) { statusEl.textContent = text; statusEl.classList.toggle("err", !!err); }
   function setBusy(b) { state.busy = b; fab.classList.toggle("busy", b); }
 
@@ -263,7 +251,7 @@ export async function start() {
         recolor();
         chunk.card = makeChunkCard(chunk, () => scrollToChunk(chunk));
         resultsEl.appendChild(chunk.card);
-        if (state.settings.useOllama) enqueueLLM(chunk);
+        if (state.settings.llmEnabled) enqueueLLM(chunk);
       }
     }
     updateStatus();
@@ -275,6 +263,14 @@ export async function start() {
     badge.style.display = state.hits ? "block" : "none";
     badge.textContent = state.hits;
     if (total && state.done >= total && state.hits === 0) renderEmpty(resultsEl, i18n.t("results.empty"));
+    maybeShowSupport();
+  }
+  // One-time, gentle "buy me a coffee" nudge, shown after the first analysis that finds echoes.
+  function maybeShowSupport() {
+    if (state.settings.supportSeen || !state.hits) return;
+    save({ supportSeen: true });
+    const el = $("#supportPrompt");
+    if (el) el.hidden = false;
   }
 
   function recolor() {
@@ -305,7 +301,7 @@ export async function start() {
     processLLM();
   }
   function requeueLLM() {
-    if (!state.settings.useOllama) return;
+    if (!state.settings.llmEnabled) return;
     state.llmQueue = state.chunks.filter((c) => c.card && c.links && c.links.length);
     processLLM();
   }

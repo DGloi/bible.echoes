@@ -4,7 +4,7 @@
   "version": "0.2.0",
   "description": "Find biblical echoes in any web page (5 languages) and link to the closest chapter — on-device, no servers.",
   "permissions": ["storage", "offscreen"],
-  "host_permissions": ["http://localhost/*", "http://127.0.0.1/*"],
+  "host_permissions": ["http://localhost/*", "http://127.0.0.1/*", "https://api.openai.com/*"],
   "background": {
     "service_worker": "background/service-worker.js",
     "type": "module"
@@ -23,7 +23,7 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["ui/*.js", "core/*.js", "locales/*.json"],
+      "resources": ["ui/*.js", "core/*.js", "locales/*.json", "assets/fonts/*.woff2"],
       "matches": ["<all_urls>"]
     }
   ]

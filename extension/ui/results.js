@@ -12,21 +12,24 @@ export function renderEmpty(container, message) {
 /**
  * Build a card for one analyzed chunk. The caller appends it and later fills the
  * analysis slot via setAnalysis().
- * @param {{text:string, links:{ref:string,score:number,chapterUrl:string}[]}} chunk
+ * Each verse shows its reference, score, AND the verse text itself (already in the
+ * target language — store.js returns the matched language's wording).
+ * @param {{text:string, links:{ref:string,score:number,text:string,chapterUrl:string}[]}} chunk
  * @param {() => void} onSelect  click handler (ignores clicks on verse links)
  * @returns {HTMLElement}
  */
 export function makeChunkCard(chunk, onSelect) {
   const node = document.createElement("div");
   node.className = "chunk";
-  const refs = chunk.links
+  const verses = chunk.links
     .map(
       (v) =>
-        `<a class="ref" href="${esc(v.chapterUrl)}" target="_blank" rel="noopener">${esc(v.ref)}</a>` +
-        `<span class="score">${(v.score * 100).toFixed(0)}%</span>`
+        `<div class="vitem"><a class="ref" href="${esc(v.chapterUrl)}" target="_blank" rel="noopener">${esc(v.ref)}</a>` +
+        `<span class="score">${(v.score * 100).toFixed(0)}%</span>` +
+        `<div class="vtext">${esc(v.text)}</div></div>`
     )
-    .join(" ");
-  node.innerHTML = `<div class="snip"></div><div class="refs">${refs}</div><div class="analysis" hidden></div>`;
+    .join("");
+  node.innerHTML = `<div class="snip"></div><div class="verses">${verses}</div><div class="analysis" hidden></div>`;
   node.querySelector(".snip").textContent =
     "“" + chunk.text.slice(0, 120) + (chunk.text.length > 120 ? "…" : "") + "”";
   node.addEventListener("click", (ev) => {

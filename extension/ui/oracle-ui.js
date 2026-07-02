@@ -1,7 +1,9 @@
-// UI for the optional one-click local-LLM setup. Opens a port to the background
-// worker, which probes Ollama → pulls the model (streamed progress) → tests it →
-// enables it. This module only renders the step list / progress / help; the actual
-// work happens in background/oracle-setup.js.
+// UI for the optional LLM reasoning layer. Owns the whole "⚙ Oracle local" gear
+// section: a provider picker (Ollama = local/on-device, OpenAI = cloud), the Ollama
+// one-click setup flow (probe → pull → test, over a runtime port to background/
+// oracle-setup.js), and the OpenAI key/model/test flow. Persistence goes through the
+// injected `save` (a single settings owner in app.js); `onChange` lets the app refresh
+// the mode picker / highlights after enable/disable/provider changes.
 
 import { i18n } from "./i18n.js";
 import { esc } from "./dom.js";
@@ -16,11 +18,7 @@ function osKey() {
   return "linux";
 }
 
-/**
- * OS-specific Ollama commands. `allow` sets OLLAMA_ORIGINS persistently for the way
- * Ollama actually runs on that OS (tray app / launchd / systemd); `oneoff` is the
- * quick single-session alternative; `pull` downloads the model.
- */
+/** OS-specific Ollama commands: install, allow-this-extension (persistent), one-off, pull. */
 function osCommands(os, origin, model) {
   if (os === "mac")
     return {
@@ -46,37 +44,110 @@ function osCommands(os, origin, model) {
 
 /**
  * @param {Object} o
- * @param {ShadowRoot} o.root        the panel's shadow root (contains #orIdle, #orSteps, …)
- * @param {(model:string) => void} o.onEnabled  called when setup succeeds and the LLM is on
- * @returns {{ show(which:'idle'|'steps'|'active'|'help'): void, setActive(model:string): void, start(): void }}
+ * @param {ShadowRoot} o.root
+ * @param {(patch:object)=>void} o.save         persist + update local settings (app.js)
+ * @param {()=>object} o.getSettings            read current settings (app.js state)
+ * @param {()=>void} o.onChange                 refresh mode picker / highlights after a change
  */
-export function createOracle({ root, onEnabled }) {
+export function createOracle({ root, save, getSettings, onChange }) {
   const $ = (sel) => root.querySelector(sel);
   const t = (k, p) => i18n.t(k, p);
 
-  /** Toggle which of the four oracle sub-sections is visible. */
-  function show(which) {
-    const ids = { idle: "orIdle", steps: "orSteps", active: "orActive", help: "orHelp" };
-    for (const [key, id] of Object.entries(ids)) {
-      const node = $("#" + id);
-      if (node) node.hidden = key !== which;
+  // ---- which provider sub-panel is visible, and its active/idle state ----
+  function showProvider(p) {
+    $("#provOllama").hidden = p !== "ollama";
+    $("#provOpenai").hidden = p !== "openai";
+    const s = getSettings();
+    const active = s.llmEnabled && s.llmProvider === p;
+    if (p === "ollama") {
+      if (active) { $("#orModel").textContent = s.ollamaModel; showOllama("active"); } else showOllama("idle");
+    } else {
+      if (active) { $("#oaModelActive").textContent = s.openaiModel; showOpenai("active"); } else showOpenai("setup");
     }
   }
+  function showOllama(which) {
+    const ids = { idle: "orIdle", steps: "orSteps", active: "orActive", help: "orHelp" };
+    for (const [k, id] of Object.entries(ids)) { const n = $("#" + id); if (n) n.hidden = k !== which; }
+  }
+  function showOpenai(which) {
+    $("#oaSetup").hidden = which !== "setup";
+    $("#oaActive").hidden = which !== "active";
+  }
+  // The OpenAI API key is entered in the toolbar popup (a trusted extension page),
+  // never here — this content-script UI must not hold the secret. This panel only
+  // shows the cloud provider's active/disable state; see popup.js for key setup.
 
-  /** Switch to the "active" state showing the running model. */
-  function setActive(model) {
-    $("#orModel").textContent = model || "";
-    show("active");
+  // ---- Ollama (local) one-click flow, over the be-ollama-setup port ----
+  function start() {
+    showOllama("steps");
+    const box = $("#orSteps");
+    box.innerHTML = "";
+    const rows = {};
+    const row = (key) => {
+      if (rows[key]) return rows[key];
+      const d = document.createElement("div");
+      d.className = "ostep run";
+      d.innerHTML = `<span class="ic"></span><span class="tx">${t("oracle.steps." + key)}</span><span class="pc"></span>`;
+      box.appendChild(d);
+      rows[key] = d;
+      return d;
+    };
+    let bar;
+    let port;
+    try {
+      port = chrome.runtime.connect({ name: "be-ollama-setup" });
+    } catch {
+      showOllama("help");
+      renderHelp("install");
+      return;
+    }
+    port.onMessage.addListener((m) => {
+      if (m.step === "done") {
+        save({ llmEnabled: true, llmProvider: "ollama", ollamaModel: m.model || $("#ollamaModel").value.trim(), ollamaUrl: $("#ollamaUrl").value.trim() });
+        $("#orModel").textContent = m.model || "";
+        showOllama("active");
+        onChange();
+        return;
+      }
+      if (m.step === "ping" && m.state === "fail") { showOllama("help"); renderHelp(m.help, m.id); return; }
+      if (m.step === "error") {
+        const r = row("test");
+        r.className = "ostep fail";
+        r.querySelector(".tx").textContent = t("status.error") + (m.text || "?");
+        addRetry(box);
+        return;
+      }
+      const r = row(m.step);
+      r.className = "ostep " + (m.state || "run");
+      const base = t("oracle.steps." + m.step);
+      const detail = m.step === "model" && m.state === "ok" ? t("oracle.present") : m.text;
+      if (detail) r.querySelector(".tx").textContent = base + " — " + detail;
+      if (m.step === "pull") {
+        if (!bar) { bar = document.createElement("div"); bar.className = "bar"; bar.innerHTML = "<i></i>"; r.after(bar); }
+        if (typeof m.pct === "number") { bar.firstChild.style.width = m.pct + "%"; r.querySelector(".pc").textContent = m.pct + "%"; }
+      }
+    });
+    port.postMessage({
+      action: "start",
+      url: $("#ollamaUrl").value.trim() || "http://localhost:11434",
+      model: $("#ollamaModel").value.trim() || "llama3.2:1b",
+    });
+  }
+  function addRetry(box) {
+    const b = document.createElement("button");
+    b.className = "ornate";
+    b.style.cssText = "margin-top:6px;font-size:12px";
+    b.textContent = t("oracle.retry");
+    b.addEventListener("click", start);
+    box.appendChild(b);
   }
 
-  // OS-tabbed setup guide. `kind === "origins"` means Ollama is reachable but blocking
-  // this extension (skip the install step); otherwise it's not running (show all steps).
+  // OS-tabbed setup guide (Ollama not reachable / blocking this extension).
   function renderHelp(kind, id) {
     const origin = "chrome-extension://" + (id || (chrome.runtime && chrome.runtime.id) || "<id>");
-    const model = ($("#ollamaModel").value || "").trim() || "llama3.2:1b";
+    const model = $("#ollamaModel").value.trim() || "llama3.2:1b";
     const help = $("#orHelp");
     const showInstall = kind !== "origins";
-
     const section = (os) => {
       const c = osCommands(os, origin, model);
       let step = 0;
@@ -91,102 +162,38 @@ export function createOracle({ root, onEnabled }) {
       parts.push(`${num()}${t("oracle.help.download")}<code>${esc(c.pull)}</code><div class="warn">${t("oracle.help.size")}</div>`);
       return parts.join("");
     };
-
     const os0 = osKey();
     help.innerHTML =
       `<div class="intro">${t(kind === "origins" ? "oracle.help.blocked" : "oracle.help.notDetected")}</div>` +
       `<div class="ostabs">${Object.keys(OS_LABEL).map((os) => `<span class="ostab${os === os0 ? " on" : ""}" data-os="${os}">${OS_LABEL[os]}</span>`).join("")}</div>` +
       `<div class="osbody">${section(os0)}</div>` +
       `<a href="#" id="orRetry">${t("oracle.retry")}</a>`;
-
     help.querySelectorAll(".ostab").forEach((tab) =>
       tab.addEventListener("click", () => {
         help.querySelectorAll(".ostab").forEach((x) => x.classList.toggle("on", x === tab));
         help.querySelector(".osbody").innerHTML = section(tab.dataset.os);
       })
     );
-    help.querySelector("#orRetry").addEventListener("click", (e) => {
-      e.preventDefault();
-      start();
-    });
+    help.querySelector("#orRetry").addEventListener("click", (e) => { e.preventDefault(); start(); });
   }
 
-  function start() {
-    show("steps");
-    const box = $("#orSteps");
-    box.innerHTML = "";
-    const rows = {};
-    const row = (key) => {
-      if (rows[key]) return rows[key];
-      const d = document.createElement("div");
-      d.className = "ostep run";
-      d.innerHTML = `<span class="ic"></span><span class="tx">${t("oracle.steps." + key)}</span><span class="pc"></span>`;
-      box.appendChild(d);
-      rows[key] = d;
-      return d;
-    };
+  // ---- init: fill fields, wire events, show the active provider ----
+  const s0 = getSettings();
+  $("#llmProvider").value = s0.llmProvider || "ollama";
+  $("#ollamaModel").value = s0.ollamaModel || "llama3.2:1b";
+  $("#ollamaUrl").value = s0.ollamaUrl || "http://localhost:11434";
 
-    let bar;
-    let port;
-    try {
-      port = chrome.runtime.connect({ name: "be-ollama-setup" });
-    } catch {
-      show("help");
-      renderHelp("install");
-      return;
-    }
-    port.onMessage.addListener((m) => {
-      if (m.step === "done") {
-        setActive(m.model);
-        onEnabled(m.model);
-        return;
-      }
-      if (m.step === "ping" && m.state === "fail") {
-        show("help");
-        renderHelp(m.help, m.id);
-        return;
-      }
-      if (m.step === "error") {
-        const r = row("test");
-        r.className = "ostep fail";
-        r.querySelector(".tx").textContent = t("status.error") + (m.text || "?");
-        addRetry(box);
-        return;
-      }
-      const r = row(m.step);
-      r.className = "ostep " + (m.state || "run");
-      const base = t("oracle.steps." + m.step);
-      // model already present → localized note; otherwise show Ollama's own status text
-      const detail = m.step === "model" && m.state === "ok" ? t("oracle.present") : m.text;
-      if (detail) r.querySelector(".tx").textContent = base + " — " + detail;
-      if (m.step === "pull") {
-        if (!bar) {
-          bar = document.createElement("div");
-          bar.className = "bar";
-          bar.innerHTML = "<i></i>";
-          r.after(bar);
-        }
-        if (typeof m.pct === "number") {
-          bar.firstChild.style.width = m.pct + "%";
-          r.querySelector(".pc").textContent = m.pct + "%";
-        }
-      }
-    });
-    port.postMessage({
-      action: "start",
-      url: $("#ollamaUrl").value.trim() || "http://localhost:11434",
-      model: $("#ollamaModel").value.trim() || "llama3.2:1b",
-    });
-  }
+  $("#llmProvider").addEventListener("change", () => {
+    const p = $("#llmProvider").value;
+    save({ llmProvider: p, llmEnabled: false }); // switching provider requires re-enabling
+    onChange();
+    showProvider(p);
+  });
+  $("#ollamaModel").addEventListener("change", () => save({ ollamaModel: $("#ollamaModel").value.trim() }));
+  $("#ollamaUrl").addEventListener("change", () => save({ ollamaUrl: $("#ollamaUrl").value.trim() }));
+  $("#orEnable").addEventListener("click", start);
+  $("#orDisable").addEventListener("click", (e) => { e.preventDefault(); save({ llmEnabled: false }); showOllama("idle"); onChange(); });
+  $("#oaDisable").addEventListener("click", (e) => { e.preventDefault(); save({ llmEnabled: false }); showOpenai("setup"); onChange(); });
 
-  function addRetry(box) {
-    const b = document.createElement("button");
-    b.className = "ornate";
-    b.style.cssText = "margin-top:6px;font-size:12px";
-    b.textContent = t("oracle.retry");
-    b.addEventListener("click", start);
-    box.appendChild(b);
-  }
-
-  return { show, setActive, start };
+  showProvider(s0.llmProvider || "ollama");
 }

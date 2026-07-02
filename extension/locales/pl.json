@@ -1,7 +1,7 @@
 {
   "fab": { "title": "Echa Biblijne — przeciągnij, aby przesunąć, kliknij, aby otworzyć" },
   "brand": { "title": "Echa Biblijne", "subtitle": "— badaj stronę w świetle Pisma —" },
-  "actions": { "reveal": "🕯️ Odkryj echa", "refresh": "Odśwież" },
+  "actions": { "reveal": "🕯️ Odkryj echa" },
   "labels": { "mode": "Czytanie", "language": "Język", "threshold": "Próg", "auto": "✶ Auto" },
   "modes": {
     "neutral": { "label": "☩ Neutralny", "title": "Analiza neutralna" },
@@ -10,6 +10,11 @@
   },
   "oracle": {
     "summary": "⚙ Lokalna Wyrocznia (LLM) — opcjonalnie",
+    "provider": "Dostawca",
+    "provOllama": "Lokalnie (Ollama)",
+    "provOpenai": "Chmura (OpenAI)",
+    "openaiPopup": "Ustaw klucz OpenAI w oknie paska narzędzi, aby włączyć tryb chmury.",
+    "cloudWarn": "⚠ Tryb chmury wysyła analizowane fragmenty do OpenAI (nie lokalnie).",
     "enable": "✨ Włącz lokalną Wyrocznię (1 kliknięcie)",
     "activePrefix": "✦ Wyrocznia aktywna —",
     "disable": "wyłącz",
@@ -40,5 +45,6 @@
     "autoTag": " (auto)"
   },
   "results": { "empty": "Żadne echo nie przekroczyło progu. Obniż go lub zmień język." },
-  "footer": { "marquee": "✠ Pax Domini sit semper vobiscum ✠   Pokój z wami   ✠   analiza w 100% offline   ✠", "counter": "Pobłogosławieni goście:" }
+  "footer": { "marquee": "✠ Pax Domini sit semper vobiscum ✠   Pokój z wami   ✠   analiza w 100% offline   ✠", "counter": "Pobłogosławieni goście:", "donate": "♥ Wesprzyj ten projekt" },
+  "support": { "enjoy": "Podoba Ci się Echa Biblijne?", "coffee": "☕ Postaw mi kawę" }
 }

@@ -47,7 +47,7 @@ export const i18n = {
 /**
  * Fill static markup from data-i18n attributes:
  *   <b data-i18n="brand.title"></b>            -> textContent
- *   <button data-i18n-title="actions.refresh"> -> title attribute
+ *   <button data-i18n-title="fab.title"> -> title attribute
  * Call this after building the panel and again whenever the language changes.
  */
 export function localize(root) {

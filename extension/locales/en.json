@@ -1,7 +1,7 @@
 {
   "fab": { "title": "Bible Echoes — drag to move, click to open" },
   "brand": { "title": "Bible Echoes", "subtitle": "— search the page in the light of Scripture —" },
-  "actions": { "reveal": "🕯️ Reveal the echoes", "refresh": "Refresh" },
+  "actions": { "reveal": "🕯️ Reveal the echoes" },
   "labels": { "mode": "Reading", "language": "Language", "threshold": "Threshold", "auto": "✶ Auto" },
   "modes": {
     "neutral": { "label": "☩ Neutral", "title": "Neutral analysis" },
@@ -10,6 +10,11 @@
   },
   "oracle": {
     "summary": "⚙ Local Oracle (LLM) — optional",
+    "provider": "Provider",
+    "provOllama": "Local (Ollama)",
+    "provOpenai": "Cloud (OpenAI)",
+    "openaiPopup": "Set your OpenAI key in the toolbar popup to enable cloud mode.",
+    "cloudWarn": "⚠ Cloud mode sends analyzed passages to OpenAI (not on-device).",
     "enable": "✨ Enable the local Oracle (1 click)",
     "activePrefix": "✦ Oracle active —",
     "disable": "disable",
@@ -40,5 +45,6 @@
     "autoTag": " (auto)"
   },
   "results": { "empty": "No echo crossed the threshold. Lower it, or change the language." },
-  "footer": { "marquee": "✠ Pax Domini sit semper vobiscum ✠   Peace be with you   ✠   100% on-device analysis   ✠", "counter": "Blessed visitors:" }
+  "footer": { "marquee": "✠ Pax Domini sit semper vobiscum ✠   Peace be with you   ✠   100% on-device analysis   ✠", "counter": "Blessed visitors:", "donate": "♥ Support this project" },
+  "support": { "enjoy": "Enjoying Bible Echo?", "coffee": "☕ Buy me a coffee" }
 }

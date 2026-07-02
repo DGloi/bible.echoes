@@ -1,7 +1,7 @@
 {
   "fab": { "title": "Échos Bibliques — glissez pour déplacer, cliquez pour ouvrir" },
   "brand": { "title": "Échos Bibliques", "subtitle": "— scrutez la page à la lumière des Écritures —" },
-  "actions": { "reveal": "🕯️ Révéler les échos", "refresh": "Rafraîchir" },
+  "actions": { "reveal": "🕯️ Révéler les échos" },
   "labels": { "mode": "Lecture", "language": "Langue", "threshold": "Seuil", "auto": "✶ Auto" },
   "modes": {
     "neutral": { "label": "☩ Neutre", "title": "Analyse neutre" },
@@ -10,6 +10,11 @@
   },
   "oracle": {
     "summary": "⚙ Oracle local (LLM) — facultatif",
+    "provider": "Fournisseur",
+    "provOllama": "Local (Ollama)",
+    "provOpenai": "Nuage (OpenAI)",
+    "openaiPopup": "Renseignez votre clé OpenAI dans la fenêtre de la barre d’outils pour activer le mode nuage.",
+    "cloudWarn": "⚠ Le mode nuage envoie les passages analysés à OpenAI (pas hors-ligne).",
     "enable": "✨ Activer l’Oracle local (1 clic)",
     "activePrefix": "✦ Oracle actif —",
     "disable": "désactiver",
@@ -40,5 +45,6 @@
     "autoTag": " (auto)"
   },
   "results": { "empty": "Nul écho n’a franchi le seuil. Abaissez-le, ou changez de langue." },
-  "footer": { "marquee": "✠ Pax Domini sit semper vobiscum ✠   Que la paix soit avec vous   ✠   analyse 100% hors-ligne   ✠", "counter": "Visiteurs bénis :" }
+  "footer": { "marquee": "✠ Pax Domini sit semper vobiscum ✠   Que la paix soit avec vous   ✠   analyse 100% hors-ligne   ✠", "counter": "Visiteurs bénis :", "donate": "♥ Soutenir ce projet" },
+  "support": { "enjoy": "Vous aimez Échos Bibliques ?", "coffee": "☕ Offrez-moi un café" }
 }

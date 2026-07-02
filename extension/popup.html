@@ -3,26 +3,53 @@
   <head>
     <meta charset="utf-8" />
     <style>
-      body { width: 260px; margin: 0; padding: 14px; font: 13px "Palatino Linotype", "Book Antiqua", Georgia, serif;
+      body { width: 300px; margin: 0; padding: 14px; font: 13px "Palatino Linotype", "Book Antiqua", Georgia, serif;
         color: #3a2a12; background: linear-gradient(160deg, #fdf6e3, #ecd9a8); }
       h1 { margin: 0 0 2px; font-size: 17px;
         background: linear-gradient(#a67c00, #6b4f12); -webkit-background-clip: text; background-clip: text; color: transparent; }
+      h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: #7b1113; margin: 14px 0 4px; border-top: 1px solid #c8961a; padding-top: 8px; }
       .sub { font-size: 11px; font-style: italic; color: #6b4f12; margin-bottom: 10px; }
       p { font-size: 12px; }
       .langs { font-size: 12px; line-height: 1.7; }
+      label { display: block; font-size: 11px; color: #6b4f12; margin-top: 6px; }
+      input { width: 100%; box-sizing: border-box; padding: 5px 7px; border: 1px solid #a98b5a; border-radius: 5px; background: #f7efd6; font-family: inherit; }
       button { font-family: inherit; cursor: pointer; color: #4a3208; border: 2px solid #8a6710; border-radius: 5px;
         background: linear-gradient(#fff7d6, #e7c14e 60%, #c8961a); padding: 6px 10px; font-weight: 700; margin-top: 8px; }
+      button.ghost { background: #eee; }
+      .warn { color: #8b0000; font-weight: 700; font-size: 11px; margin-top: 6px; }
+      .note { color: #7a5a1e; font-size: 10px; margin-top: 4px; line-height: 1.4; }
       .status { font-size: 11px; margin-top: 8px; min-height: 14px; color: #2e6b2e; }
       .status.err { color: #8b0000; }
+      .row { display: flex; gap: 6px; }
+      .row button { flex: 1; }
     </style>
   </head>
   <body>
     <h1>Bible Echo ✝</h1>
-    <div class="sub">100% hors-ligne · on-device</div>
-    <p>Click the golden <b>✝ medallion</b> on any page (drag it anywhere). All settings — language, mode, sensitivity, local LLM — live in that panel.</p>
+    <div class="sub">100% on-device · except the optional cloud LLM</div>
+    <p>Click the golden <b>✝ medallion</b> on any page (drag it anywhere). Language, mode, sensitivity and the local (Ollama) LLM live in that panel.</p>
     <div class="langs">📖 KJV 1611 · Martin 1744 · S. Escrituras 1569 · Diodati 1649 · Gdańska</div>
-    <button id="selfTest">Run tokenizer self-test</button>
+
+    <h2>Cloud LLM — OpenAI</h2>
+    <div class="warn">⚠ Cloud mode sends analyzed page passages to OpenAI (not on-device).</div>
+    <div class="note">Your key is stored locally (unencrypted) in this browser profile. Use a
+      <b>restricted key with a low spending cap</b>, and clear it when you're done.</div>
+    <label>API key</label>
+    <input type="password" id="oaKey" placeholder="sk-…" autocomplete="off" spellcheck="false" />
+    <label>Model</label>
+    <input type="text" id="oaModel" placeholder="gpt-4o-mini" spellcheck="false" />
+    <label>API base URL</label>
+    <input type="text" id="oaBase" placeholder="https://api.openai.com/v1" spellcheck="false" />
+    <div class="row">
+      <button id="oaSave">Test &amp; enable</button>
+      <button id="oaClear" class="ghost">Clear key</button>
+    </div>
+    <div class="status" id="oaStatus"></div>
+
+    <h2>Diagnostics</h2>
+    <button id="selfTest" class="ghost">Run tokenizer self-test</button>
     <div class="status" id="status"></div>
+
     <script type="module" src="popup.js"></script>
   </body>
 </html>

@@ -7,17 +7,20 @@
 /**
  * Default settings, merged under whatever the user has saved.
  * @typedef {Object} Settings
- * @property {number}  minScore        Cosine threshold; below it a passage is "no echo".
- * @property {number}  maxPassages     Cap on passages embedded per page (perf).
- * @property {number}  maxResults      Cap on echoes returned to the panel.
+ * @property {number}  minScore     Cosine threshold; below it a passage is "no echo".
+ * @property {number}  maxPassages  Cap on passages embedded per chunk (perf).
+ * @property {number}  maxResults   Cap on echoes returned per chunk.
  * @property {'auto'|'en'|'fr'|'es'|'it'|'pl'} language  Target Bible language; 'auto' detects it.
  * @property {'neutral'|'positive'|'negative'} mode      LLM reading mode.
- * @property {boolean} useOllama       Whether the optional local LLM is enabled.
- * @property {string}  ollamaUrl       Base URL of the local Ollama server.
- * @property {string}  ollamaModel     Ollama model tag to use/pull.
- * @property {number}  ollamaTopPassages  How many top echoes to send to the LLM.
- * @property {number|null} fabX        Persisted floating-button X (px from left); null = default corner.
- * @property {number|null} fabY        Persisted floating-button Y (px from top).
+ * @property {boolean} llmEnabled    Whether the optional per-chunk LLM analysis runs.
+ * @property {'ollama'|'openai'} llmProvider  Which LLM backend to use when enabled.
+ * @property {string}  ollamaUrl     Base URL of the local Ollama server.
+ * @property {string}  ollamaModel   Ollama model tag.
+ * @property {string}  openaiBaseUrl OpenAI (or compatible) API base, e.g. https://api.openai.com/v1.
+ * @property {string}  openaiModel   OpenAI model id.
+ * @property {string}  openaiApiKey  OpenAI key — stored locally on this device only.
+ * @property {number|null} fabX      Persisted floating-button X (px from left); null = default corner.
+ * @property {number|null} fabY      Persisted floating-button Y (px from top).
  */
 export const DEFAULTS = {
   minScore: 0.5, // multilingual cosine sits a touch higher than the old English model
@@ -25,10 +28,18 @@ export const DEFAULTS = {
   maxResults: 60,
   language: "auto",
   mode: "neutral",
-  useOllama: false,
+
+  // --- optional LLM reasoning (off by default; runs one analysis per matched chunk) ---
+  llmEnabled: false,
+  llmProvider: "ollama", // "ollama" (local, on-device) | "openai" (cloud — sends text off-device)
   ollamaUrl: "http://localhost:11434",
   ollamaModel: "llama3.2:1b",
-  ollamaTopPassages: 4,
+  openaiBaseUrl: "https://api.openai.com/v1",
+  openaiModel: "gpt-4o-mini",
+  openaiApiKey: "",
+
+  supportSeen: false, // whether the one-time "buy me a coffee" prompt has already been shown
+
   fabX: null,
   fabY: null,
 };

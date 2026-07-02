@@ -37,3 +37,10 @@ export const HL_ACTIVE = "bible-echo-active";
 
 /** Every CSS Custom Highlight name we register — used to clear them all at once. */
 export const HL_NAMES = [...Object.values(MODES).map((m) => m.hl), HL_ACTIVE];
+
+/**
+ * Destination of the "Support this project" footer link. REPLACE with your own
+ * Ko-fi / Buy Me a Coffee / PayPal.me / GitHub Sponsors URL before publishing.
+ * Tip: a Ko-fi page with preset amounts ($3/$5/$10) converts better than a blank field.
+ */
+export const DONATE_URL = "https://ko-fi.com/REPLACE_ME";

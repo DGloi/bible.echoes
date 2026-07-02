@@ -1,9 +1,8 @@
 // One-click "Enable local LLM" flow: probe Ollama → pull the model (streaming
-// progress) → test it → persist useOllama. Driven over a long-lived port (opened
+// progress) → test it. The content UI persists the enabled state. Driven over a port (opened
 // by ui/oracle-ui.js) so progress can stream and the worker stays alive during a
 // potentially long model download. Importing this module registers the listener.
 
-import { setSettings } from "../core/settings.js";
 import { version, ping, pull, test } from "./ollama.js";
 
 chrome.runtime.onConnect.addListener((port) => {
@@ -51,7 +50,7 @@ async function runSetup(port, opts) {
     await test(url, model);
     post({ step: "test", state: "ok" });
 
-    await setSettings({ useOllama: true, ollamaModel: model, ollamaUrl: url });
+    // The content UI persists llmEnabled/llmProvider on "done" (single settings owner).
     post({ step: "done", state: "ok", model });
   } catch (e) {
     post({ step: "error", state: "fail", text: String((e && e.message) || e) });

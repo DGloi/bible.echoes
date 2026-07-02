@@ -1,7 +1,7 @@
 {
   "fab": { "title": "Ecos Bíblicos — arrastra para mover, haz clic para abrir" },
   "brand": { "title": "Ecos Bíblicos", "subtitle": "— escruta la página a la luz de las Escrituras —" },
-  "actions": { "reveal": "🕯️ Revelar los ecos", "refresh": "Actualizar" },
+  "actions": { "reveal": "🕯️ Revelar los ecos" },
   "labels": { "mode": "Lectura", "language": "Idioma", "threshold": "Umbral", "auto": "✶ Auto" },
   "modes": {
     "neutral": { "label": "☩ Neutral", "title": "Análisis neutral" },
@@ -10,6 +10,11 @@
   },
   "oracle": {
     "summary": "⚙ Oráculo local (LLM) — opcional",
+    "provider": "Proveedor",
+    "provOllama": "Local (Ollama)",
+    "provOpenai": "Nube (OpenAI)",
+    "openaiPopup": "Configura tu clave de OpenAI en la ventana de la barra de herramientas para activar el modo nube.",
+    "cloudWarn": "⚠ El modo nube envía los pasajes analizados a OpenAI (no local).",
     "enable": "✨ Activar el Oráculo local (1 clic)",
     "activePrefix": "✦ Oráculo activo —",
     "disable": "desactivar",
@@ -40,5 +45,6 @@
     "autoTag": " (auto)"
   },
   "results": { "empty": "Ningún eco superó el umbral. Bájalo o cambia de idioma." },
-  "footer": { "marquee": "✠ Pax Domini sit semper vobiscum ✠   La paz sea con vosotros   ✠   análisis 100% sin conexión   ✠", "counter": "Visitantes benditos:" }
+  "footer": { "marquee": "✠ Pax Domini sit semper vobiscum ✠   La paz sea con vosotros   ✠   análisis 100% sin conexión   ✠", "counter": "Visitantes benditos:", "donate": "♥ Apoyar este proyecto" },
+  "support": { "enjoy": "¿Te gusta Ecos Bíblicos?", "coffee": "☕ Invítame a un café" }
 }
